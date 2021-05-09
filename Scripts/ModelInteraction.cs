@@ -62,7 +62,7 @@ public class ModelInteraction : MonoBehaviour
             totalPosition = 0f;
             OnEndInteraction?.Invoke();
         }
-
+        
         return touches;
         
     }
