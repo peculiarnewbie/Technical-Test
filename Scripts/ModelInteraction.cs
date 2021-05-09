@@ -9,10 +9,13 @@ public class ModelInteraction : MonoBehaviour
     [SerializeField] private float swipeRotationSpeed = 5f;
     [SerializeField] private float scaleSpeed = 5f;
     Transform modelTransform;
-    float modelScale = 1f;
+    float currentScale = 1f;
+    float modelScale;
     public event Action OnInteraction;
     public event Action OnEndInteraction;
     bool isInteracting = false;
+    int fingers = 0;
+    float totalPosition = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -24,18 +27,29 @@ public class ModelInteraction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckInput();
+        fingers = CheckInput(fingers);
+
     }
 
-    public void CheckInput()
+    public int CheckInput(int fingers)
     {
         int touches = Input.touchCount;
+        int lastTouches = fingers;
+        bool newTouch = false;
+
+        if (lastTouches != touches)
+        {
+            newTouch = true;
+            if (touches == 1)
+                currentScale *= modelScale;
+        }
+
         if(touches > 0)
         {
             if(touches == 1)
                 RotateModel();
             else
-                ScaleModel(touches);
+                totalPosition = ScaleModel(touches,newTouch, totalPosition);
 
             if (!isInteracting)
             {
@@ -46,8 +60,11 @@ public class ModelInteraction : MonoBehaviour
         else
         {
             isInteracting = false;
+            totalPosition = 0f;
             OnEndInteraction?.Invoke();
         }
+
+        return touches;
         
     }
 
@@ -56,20 +73,32 @@ public class ModelInteraction : MonoBehaviour
 
     }
 
-    public void ScaleModel(int fingers)
+    public float ScaleModel(int touches, bool newTouch, float prevTotal)
     {
-        Vector2 total = Vector2.zero;
-        Vector2 prevTotal = total;
-        //Vector2 center = total;
+        Vector2[] currentPositions = new Vector2[9];
+        Vector2[] lastPositions = new Vector2[9];
+        float currentDistance = 0f;
+        float lastDistance = prevTotal;
 
-        for(int i = 0; i < Input.touchCount; i++)
+        for(int i = 0; i < touches; i++)
         {
             Touch touch = Input.GetTouch(i);
-            total += touch.position;
-            prevTotal += touch.position - touch.deltaPosition;
+            currentPositions[i] = touch.position;
+            lastPositions[i] = touch.position - touch.deltaPosition;
+        }
+        
+        //calculate perimeter of fingers
+        for(int i = 0; i < touches; i++)
+        {
+            int next = (i + 1) % touches;
+            currentDistance += Vector2.Distance(currentPositions[i], currentPositions[next]);
+            if (newTouch)
+                lastDistance += Vector2.Distance(lastPositions[i], lastPositions[next]);
         }
 
-        modelScale = total.magnitude / prevTotal.magnitude;
-        modelTransform.transform.localScale = Vector3.one * modelScale;
+        modelScale = currentDistance / lastDistance;
+        modelTransform.transform.localScale = Vector3.one * currentScale * modelScale;
+
+        return lastDistance;
     }
 }
