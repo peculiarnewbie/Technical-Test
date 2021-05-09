@@ -11,6 +11,8 @@ public class ModelInteraction : MonoBehaviour
     Transform modelTransform;
     float modelScale = 1f;
     public event Action OnInteraction;
+    public event Action OnEndInteraction;
+    bool isInteracting = false;
 
     // Start is called before the first frame update
     void Start()
@@ -22,16 +24,52 @@ public class ModelInteraction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ScaleModel();
+        CheckInput();
     }
 
-    public void ScaleModel()
+    public void CheckInput()
     {
+        int touches = Input.touchCount;
+        if(touches > 0)
+        {
+            if(touches == 1)
+                RotateModel();
+            else
+                ScaleModel(touches);
+
+            if (!isInteracting)
+            {
+                isInteracting = true;
+                OnInteraction?.Invoke();
+            }
+        }
+        else
+        {
+            isInteracting = false;
+            OnEndInteraction?.Invoke();
+        }
+        
+    }
+
+    public void RotateModel()
+    {
+
+    }
+
+    public void ScaleModel(int fingers)
+    {
+        Vector2 total = Vector2.zero;
+        Vector2 prevTotal = total;
+        //Vector2 center = total;
+
+        for(int i = 0; i < Input.touchCount; i++)
+        {
+            Touch touch = Input.GetTouch(i);
+            total += touch.position;
+            prevTotal += touch.position - touch.deltaPosition;
+        }
+
+        modelScale = total.magnitude / prevTotal.magnitude;
         modelTransform.transform.localScale = Vector3.one * modelScale;
-    }
-
-    public void InteractionFunction()
-    {
-        OnInteraction?.Invoke();
     }
 }

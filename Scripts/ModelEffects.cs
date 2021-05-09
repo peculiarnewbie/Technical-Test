@@ -17,6 +17,7 @@ public class ModelEffects : MonoBehaviour
     {
         m_Material = GetComponent<Renderer>().material;
         ModelInteraction.current.OnInteraction += PauseEffects;
+        ModelInteraction.current.OnEndInteraction += ResumeEffects;
     }
 
     // Update is called once per frame
