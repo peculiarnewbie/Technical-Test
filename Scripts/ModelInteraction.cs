@@ -10,7 +10,7 @@ public class ModelInteraction : MonoBehaviour
     [SerializeField] private float scaleSpeed = 5f;
     Transform modelTransform;
     float currentScale = 1f;
-    float modelScale;
+    float modelScale = 1f;
     public event Action OnInteraction;
     public event Action OnEndInteraction;
     bool isInteracting = false;
@@ -40,8 +40,8 @@ public class ModelInteraction : MonoBehaviour
         if (lastTouches != touches)
         {
             newTouch = true;
-            if (touches == 1)
-                currentScale *= modelScale;
+            if (touches == 1 && lastTouches == 2)
+                ReadjustScale();
         }
 
         if(touches > 0)
@@ -78,7 +78,12 @@ public class ModelInteraction : MonoBehaviour
         Vector2[] currentPositions = new Vector2[9];
         Vector2[] lastPositions = new Vector2[9];
         float currentDistance = 0f;
-        float lastDistance = prevTotal;
+        float lastDistance = 0f;
+
+        if (!newTouch)
+            lastDistance = prevTotal;
+        else
+            ReadjustScale();
 
         for(int i = 0; i < touches; i++)
         {
@@ -93,12 +98,20 @@ public class ModelInteraction : MonoBehaviour
             int next = (i + 1) % touches;
             currentDistance += Vector2.Distance(currentPositions[i], currentPositions[next]);
             if (newTouch)
+            {
                 lastDistance += Vector2.Distance(lastPositions[i], lastPositions[next]);
+                Debug.Log(i + " = " + currentPositions[i] + ", " + lastPositions[i]);
+            }
         }
 
         modelScale = currentDistance / lastDistance;
         modelTransform.transform.localScale = Vector3.one * currentScale * modelScale;
 
         return lastDistance;
+    }
+
+    public void ReadjustScale()
+    {
+        currentScale *= modelScale;
     }
 }
