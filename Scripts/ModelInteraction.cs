@@ -16,6 +16,7 @@ public class ModelInteraction : MonoBehaviour
     bool isInteracting = false;
     int fingers = 0;
     float totalPosition = 0f;
+    float rotateSpeed = 0.1f;
 
     // Start is called before the first frame update
     void Start()
@@ -40,8 +41,6 @@ public class ModelInteraction : MonoBehaviour
         if (lastTouches != touches)
         {
             newTouch = true;
-            if (touches == 1 && lastTouches == 2)
-                ReadjustScale();
         }
 
         if(touches > 0)
@@ -70,20 +69,15 @@ public class ModelInteraction : MonoBehaviour
 
     public void RotateModel()
     {
-
+        float range;
+        range = Input.GetTouch(0).deltaPosition.x;
+        transform.Rotate(0, -range * 0.2f, 0);
     }
 
     public float ScaleModel(int touches, bool newTouch, float prevTotal)
     {
         Vector2[] currentPositions = new Vector2[9];
         Vector2[] lastPositions = new Vector2[9];
-        float currentDistance = 0f;
-        float lastDistance = 0f;
-
-        if (!newTouch)
-            lastDistance = prevTotal;
-        else
-            ReadjustScale();
 
         for(int i = 0; i < touches; i++)
         {
@@ -91,9 +85,17 @@ public class ModelInteraction : MonoBehaviour
             currentPositions[i] = touch.position;
             lastPositions[i] = touch.position - touch.deltaPosition;
         }
-        
+
+        float currentDistance = 0f;
+        float lastDistance = 0f;
+
+        if (!newTouch)
+            lastDistance = prevTotal;
+        else
+            currentScale *= modelScale;
+
         //calculate perimeter of fingers
-        for(int i = 0; i < touches; i++)
+        for (int i = 0; i < touches; i++)
         {
             int next = (i + 1) % touches;
             currentDistance += Vector2.Distance(currentPositions[i], currentPositions[next]);
@@ -110,8 +112,4 @@ public class ModelInteraction : MonoBehaviour
         return lastDistance;
     }
 
-    public void ReadjustScale()
-    {
-        currentScale *= modelScale;
-    }
 }
