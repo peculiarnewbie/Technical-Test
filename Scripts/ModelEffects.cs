@@ -29,7 +29,7 @@ public class ModelEffects : MonoBehaviour
         else
             colorAlpha = 1f;
 
-        m_Material.color = new Color(0.01f, 0.01f, 0.01f, colorAlpha);
+        m_Material.color = new Color(m_Material.color.r, m_Material.color.g, m_Material.color.b, colorAlpha);
 
         if (isAnimating)
             modelAnimator.speed = 1;

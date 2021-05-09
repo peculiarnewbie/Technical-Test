@@ -83,9 +83,9 @@ Material:
     m_Ints: []
     m_Floats:
     - DissolveAmount: 1.2
-    - DissolveScale: 2
+    - DissolveScale: 4
     - DistortionAmount: 0.1
-    - DistortionScale: 5
+    - DistortionScale: 10
     - Noise_Scale: 5
     - ScrollSpeed: -0.3
     - ScrollSpeed2: -0.3
