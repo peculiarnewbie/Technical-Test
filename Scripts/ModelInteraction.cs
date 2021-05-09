@@ -8,6 +8,8 @@ public class ModelInteraction : MonoBehaviour
     public static ModelInteraction current;
     [SerializeField] private float swipeRotationSpeed = 5f;
     [SerializeField] private float scaleSpeed = 5f;
+    [SerializeField] private float minScale = 0.2f;
+    [SerializeField] private float maxScale = 3f;
     Transform modelTransform;
     float currentScale = 1f;
     float modelScale = 1f;
@@ -17,7 +19,6 @@ public class ModelInteraction : MonoBehaviour
     bool isInteracting = false;
     int fingers = 0;
     float totalPosition = 0f;
-    float rotateSpeed = 0.1f;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +31,6 @@ public class ModelInteraction : MonoBehaviour
     void Update()
     {
         fingers = CheckInput(fingers);
-
     }
 
     public int CheckInput(int fingers)
@@ -49,7 +49,9 @@ public class ModelInteraction : MonoBehaviour
             if(touches == 1)
                 RotateModel();
             else
-                totalPosition = ScaleModel(touches,newTouch, totalPosition);
+            {
+                totalPosition = ScaleModel(touches, newTouch, totalPosition);
+           }
 
             if (!isInteracting)
             {
@@ -93,7 +95,9 @@ public class ModelInteraction : MonoBehaviour
         if (!newTouch)
             lastDistance = prevTotal;
         else
+        {
             currentScale *= modelScale;
+        }
 
         //calculate perimeter of fingers
         for (int i = 0; i < touches; i++)
@@ -108,7 +112,9 @@ public class ModelInteraction : MonoBehaviour
         }
 
         modelScale = currentDistance / lastDistance;
-        modelTransform.transform.localScale = Vector3.one * currentScale * modelScale;
+        float scaleToApply = currentScale * modelScale;
+        scaleToApply = ClampScale(scaleToApply);
+        modelTransform.transform.localScale = Vector3.one * scaleToApply;
 
         return lastDistance;
     }
@@ -116,6 +122,22 @@ public class ModelInteraction : MonoBehaviour
     public void TogglePause()
     {
         OnPauseToggle.Invoke();
+    }
+
+    private float ClampScale(float scaleToClamp)
+    {
+        if(scaleToClamp > maxScale)
+        {
+            scaleToClamp = maxScale;
+            currentScale = scaleToClamp;
+        }
+        else if(scaleToClamp < minScale)
+        {
+            scaleToClamp = minScale;
+            currentScale = scaleToClamp;
+        }
+
+        return scaleToClamp;
     }
 
 }
