@@ -11,8 +11,6 @@ public class Share : MonoBehaviour
     private bool isProcessing = false;
     public string message;
 
-    
-
     void Awake()
     {
         MakeInstance();

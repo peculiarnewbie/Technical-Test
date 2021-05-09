@@ -42,6 +42,8 @@ public class ModelEffects : MonoBehaviour
             BlinkEffect();
             if (isAnimating)
                 modelAnimator.speed = 1;
+            else
+                modelAnimator.speed = 0;
         }
         else
             modelAnimator.speed = 0;
