@@ -13,6 +13,7 @@ public class ModelInteraction : MonoBehaviour
     float modelScale = 1f;
     public event Action OnInteraction;
     public event Action OnEndInteraction;
+    public event Action OnPauseToggle;
     bool isInteracting = false;
     int fingers = 0;
     float totalPosition = 0f;
@@ -110,6 +111,11 @@ public class ModelInteraction : MonoBehaviour
         modelTransform.transform.localScale = Vector3.one * currentScale * modelScale;
 
         return lastDistance;
+    }
+
+    public void TogglePause()
+    {
+        OnPauseToggle.Invoke();
     }
 
 }

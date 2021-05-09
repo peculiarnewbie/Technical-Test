@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class ModelEffects : MonoBehaviour
 {
+    [SerializeField] ModelInteraction modInteract;
+    [SerializeField] bool rendEnabled = true;
+    bool firstRendered = false;
+    Renderer rend;
     Material m_Material;
     public bool isBlinking = true;
     public bool isAnimating = true;
+    public bool isPaused = false;
     [SerializeField] private float blinkSpeed = 5f;
     float colorAlpha;
     float timeSpent = 0;
@@ -15,13 +20,34 @@ public class ModelEffects : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_Material = GetComponent<Renderer>().material;
-        ModelInteraction.current.OnInteraction += PauseEffects;
-        ModelInteraction.current.OnEndInteraction += ResumeEffects;
+        rend = GetComponent<Renderer>();
+        m_Material = rend.material;
+        modInteract.OnInteraction += PauseEffects;
+        modInteract.OnEndInteraction += ResumeEffects;
+        modInteract.OnPauseToggle += ToggleEffects;
+        ToggleRenderer();
     }
 
     // Update is called once per frame
     void Update()
+    {
+        if (!firstRendered)
+        {
+            CheckFirstRender();
+            return;
+        }
+
+        if (!isPaused)
+        {
+            BlinkEffect();
+            if (isAnimating)
+                modelAnimator.speed = 1;
+        }
+        else
+            modelAnimator.speed = 0;
+    }
+
+    private void BlinkEffect()
     {
         timeSpent += Time.deltaTime * blinkSpeed;
         if (isBlinking)
@@ -30,11 +56,6 @@ public class ModelEffects : MonoBehaviour
             colorAlpha = 1f;
 
         m_Material.color = new Color(m_Material.color.r, m_Material.color.g, m_Material.color.b, colorAlpha);
-
-        if (isAnimating)
-            modelAnimator.speed = 1;
-        else
-            modelAnimator.speed = 0;
     }
 
     //pauses animation and blinking
@@ -48,5 +69,25 @@ public class ModelEffects : MonoBehaviour
     {
         isBlinking = true;
         isAnimating = true;
+    }
+
+    public void ToggleEffects()
+    {
+        isPaused = !isPaused;
+    }
+
+    public void ToggleRenderer()
+    {
+        rendEnabled = !rendEnabled;
+        rend.enabled = rendEnabled;
+    }
+
+    private void CheckFirstRender()
+    {
+        if (rend.enabled)
+        {
+            firstRendered = true;
+            ToggleRenderer();
+        }
     }
 }
