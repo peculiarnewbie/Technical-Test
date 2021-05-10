@@ -4,18 +4,25 @@ using UnityEngine;
 
 public class ModelEffects : MonoBehaviour
 {
+    public Animator modelAnimator;
     [SerializeField] ModelInteraction modInteract;
+
+    [SerializeField] AudioSource fireSound;
+    [SerializeField] AudioSource confirmSound;
+
     [SerializeField] bool rendEnabled = true;
-    bool firstRendered = false;
+    [SerializeField] private float blinkSpeed = 5f;
+
     Renderer rend;
     Material m_Material;
+    bool firstRendered = false;
+
     public bool isBlinking = true;
     public bool isAnimating = true;
     public bool isPaused = false;
-    [SerializeField] private float blinkSpeed = 5f;
+
     float colorAlpha;
     float timeSpent = 0;
-    public Animator modelAnimator;
 
     // Start is called before the first frame update
     void Start()
@@ -91,6 +98,12 @@ public class ModelEffects : MonoBehaviour
         {
             firstRendered = true;
             ToggleRenderer();
+
+            if (fireSound != null)
+            {
+                fireSound.Play();
+                confirmSound.Play();
+            }
         }
     }
 }

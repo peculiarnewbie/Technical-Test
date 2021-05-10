@@ -10,15 +10,17 @@ public class ModelInteraction : MonoBehaviour
     [SerializeField] private float scaleSpeed = 5f;
     [SerializeField] private float minScale = 0.2f;
     [SerializeField] private float maxScale = 3f;
-    Transform modelTransform;
-    float currentScale = 1f;
-    float modelScale = 1f;
+
     public event Action OnInteraction;
     public event Action OnEndInteraction;
     public event Action OnPauseToggle;
-    bool isInteracting = false;
-    int fingers = 0;
+
+    Transform modelTransform;
+    float currentScale = 1f;
+    float modelScale = 1f;
     float totalPosition = 0f;
+    int fingers = 0;
+    bool isInteracting = false;
 
     // Start is called before the first frame update
     void Start()
