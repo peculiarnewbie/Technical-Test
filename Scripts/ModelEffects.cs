@@ -31,9 +31,9 @@ public class ModelEffects : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!firstRendered)
+        if (!firstRendered)// try solve problem where vuforia alrready disables renderer
         {
-            CheckFirstRender();
+            CheckFirstRender(); 
             return;
         }
 
@@ -49,6 +49,7 @@ public class ModelEffects : MonoBehaviour
             modelAnimator.speed = 0;
     }
 
+    // slow blinking effect using color alpha
     private void BlinkEffect()
     {
         timeSpent += Time.deltaTime * blinkSpeed;

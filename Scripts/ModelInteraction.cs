@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ModelInteraction : MonoBehaviour
 {
-    public static ModelInteraction current;
+    //public static ModelInteraction current;
     [SerializeField] private float swipeRotationSpeed = 5f;
     [SerializeField] private float scaleSpeed = 5f;
     [SerializeField] private float minScale = 0.2f;
@@ -23,7 +23,7 @@ public class ModelInteraction : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        current = this;
+        //current = this;
         modelTransform = GetComponent<Transform>();
     }
 
@@ -49,9 +49,7 @@ public class ModelInteraction : MonoBehaviour
             if(touches == 1)
                 RotateModel();
             else
-            {
                 totalPosition = ScaleModel(touches, newTouch, totalPosition);
-           }
 
             if (!isInteracting)
             {
@@ -90,31 +88,25 @@ public class ModelInteraction : MonoBehaviour
         }
 
         float currentDistance = 0f;
-        float lastDistance = 0f;
-
-        if (!newTouch)
-            lastDistance = prevTotal;
-        else
-        {
-            currentScale *= modelScale;
-        }
+        float lastDistance = prevTotal;
 
         //calculate perimeter of fingers
         for (int i = 0; i < touches; i++)
         {
             int next = (i + 1) % touches;
             currentDistance += Vector2.Distance(currentPositions[i], currentPositions[next]);
+
             if (newTouch)
             {
                 lastDistance += Vector2.Distance(lastPositions[i], lastPositions[next]);
-                Debug.Log(i + " = " + currentPositions[i] + ", " + lastPositions[i]);
+                //Debug.Log(i + " = " + currentPositions[i] + ", " + lastPositions[i]);
             }
         }
 
         modelScale = currentDistance / lastDistance;
-        float scaleToApply = currentScale * modelScale;
-        scaleToApply = ClampScale(scaleToApply);
-        modelTransform.transform.localScale = Vector3.one * scaleToApply;
+        currentScale *= modelScale;
+        currentScale = ClampScale(currentScale);
+        modelTransform.transform.localScale = Vector3.one * currentScale;
 
         return lastDistance;
     }
@@ -129,12 +121,10 @@ public class ModelInteraction : MonoBehaviour
         if(scaleToClamp > maxScale)
         {
             scaleToClamp = maxScale;
-            currentScale = scaleToClamp;
         }
         else if(scaleToClamp < minScale)
         {
             scaleToClamp = minScale;
-            currentScale = scaleToClamp;
         }
 
         return scaleToClamp;
